@@ -1,0 +1,19 @@
+<div class="row">
+	<div class="col-md-6 col-md-offset-3">
+		<div class="page-header">
+			<h1>PMO Site Generator</h1>
+		</div>
+
+		<% if @new_repo_url %>
+			<div class="alert alert-success" role="alert"><b>Success!</b> Your new repo is now available at <a href="<%= @new_repo_url %>"><%= @new_repo_url %></a></div>
+		<% end %>
+
+		<form method="post" action="<%= url('/sites') %>">
+			<div class="form-group">
+				<label for="site-name">Site name</label>
+				<input type="text" name="site_name" class="form-control" id="site-name" placeholder="Site name">
+			</div>
+			<button type="submit" class="btn btn-default">Submit</button>
+		</form>
+	</div>
+</div>
