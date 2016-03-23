@@ -40,22 +40,33 @@ helpers do
 end
 
 get '/' do
-  redirect to('/auth/github') unless signed_in?
-  @new_repo_url = session.delete(:new_repo_url)
+  redirect to('/sites') if signed_in?
   erb(:index)
+end
+
+get '/sites' do
+  authorize!
+  @new_repo_url = session.delete(:new_repo_url)
+  erb(:sites)
 end
 
 get '/auth/github/callback' do
   auth = env['omniauth.auth']
-  unless org_member?(GITHUB_ORGANIZATION)
-    halt 403, "This applications is only available for people in the #{GITHUB_ORGANIZATION} GitHub organization"
-  end
   session[:access_token] = auth[:credentials][:token]
+  session[:name] = auth[:info][:name]
+  redirect to('/')
+end
+
+get '/sign_out' do
+  session.clear
   redirect to('/')
 end
 
 post '/sites' do
   authorize!
+  unless org_member?(GITHUB_ORGANIZATION)
+    halt 403, "This applications is only available for people in the #{GITHUB_ORGANIZATION} GitHub organization"
+  end
   # This uses OCTOKIT_ACCESS_TOKEN from ENV to auth with GitHub.
   repo = github.create_repository(params[:site_name], organization: GITHUB_ORGANIZATION)
   github.create_issue(repo[:full_name], 'Non-technical tasks', erb(:non_technical_tasks))
@@ -67,21 +78,3 @@ end
 error Octokit::Forbidden do
   "You are not authorized to create repositories in #{GITHUB_ORGANIZATION}. Please contact an organization admin."
 end
-
-__END__
-
-@@ non_technical_tasks
-- [ ] Gather any non-legislative data that's needed in CSV format
-- [ ] Decide on a domain name for the site
-- [ ] Get Twitter username
-- [ ] Get email address
-- [ ] Setup Google Analytics
-
-@@ technical_tasks
-- [ ] Add an unstyled theme to this repo
-- [ ] Include a `404.html` template
-- [ ] Create an [orphan `gh-pages` branch](https://help.github.com/articles/creating-project-pages-manually/#create-a-gh-pages-branch) for building the site into
-- [ ] Configure this repo to build on Travis CI
-- [ ] Add required plugins and configure them
-- [ ] Add this country to the datasource updater
-- [ ] Setup DNS
