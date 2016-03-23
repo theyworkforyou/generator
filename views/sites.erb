@@ -1,3 +1,8 @@
+<% if @new_repo_url %>
+  <div class="alert alert-success">
+    <b>Success! Your new repo is available at <a href="<%= @new_repo_url %>"><%= @new_repo_url %></a>.</a>
+  </div>
+<% end %>
 <form method="post" action="<%= url('/sites') %>">
   <div class="form-group">
     <label for="site-name">Site name</label>
