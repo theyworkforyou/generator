@@ -67,7 +67,6 @@ post '/sites' do
   unless org_member?(GITHUB_ORGANIZATION)
     halt 403, "This applications is only available for people in the #{GITHUB_ORGANIZATION} GitHub organization"
   end
-  # This uses OCTOKIT_ACCESS_TOKEN from ENV to auth with GitHub.
   repo = github.create_repository(params[:site_name], organization: GITHUB_ORGANIZATION)
   github.create_issue(repo[:full_name], 'Non-technical tasks', erb(:non_technical_tasks, layout: false))
   github.create_issue(repo[:full_name], 'Technical tasks', erb(:technical_tasks, layout: false))
